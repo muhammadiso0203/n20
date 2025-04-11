@@ -33,6 +33,6 @@ const router = [
   tournamentsRouter,
 ];
 
-app.use("/football", ...router)
+app.use("/football", ...router);
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
