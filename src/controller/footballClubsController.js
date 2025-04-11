@@ -1,10 +1,10 @@
-import { FootballClubs } from "../models/index.js";
+import { footballClubs } from "../models/index.js";
 
 export const footballClubsController = {
   findOne: async (req, res, next) => {
     const { id } = req.params;
     try {
-      const oneFootballClub = await FootballClubs.findById(id);
+      const oneFootballClub = await footballClubs.findById(id);
 
       if (!oneFootballClub)
         return res.status(404).json(`Football Club not found`);
@@ -17,7 +17,7 @@ export const footballClubsController = {
 
   findAll: async (req, res, next) => {
     try {
-      const allFootballClubs = await FootballClubs.find();
+      const allFootballClubs = await footballClubs.find();
       res.json(allFootballClubs);
     } catch (error) {
       next(error);
@@ -32,7 +32,7 @@ export const footballClubsController = {
         return res.status(400).send(`All data is required`);
       }
 
-      const newFootballClub = new FootballClubs({
+      const newFootballClub = new footballClubs({
         club_name,
         city,
         country,
@@ -55,7 +55,7 @@ export const footballClubsController = {
         return res.status(400).send(`At least one data is required `);
       }
 
-      const updatedFootballClub = await FootballClubs.findByIdAndUpdate(
+      const updatedFootballClub = await footballClubs.findByIdAndUpdate(
         id,
         { club_name, city, country, founded_year },
 
@@ -82,7 +82,7 @@ export const footballClubsController = {
         return res.status(400).json("Invalid ID format");
       }
 
-      const deletedFootballClub = await FootballClubs.deleteOne({ _id: id });
+      const deletedFootballClub = await footballClubs.deleteOne({ _id: id });
 
       if (!deletedFootballClub)
         return res.status(404).json(`Football Club not found`);

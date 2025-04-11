@@ -24,7 +24,7 @@ const footballClubsSchema = new mongoose.Schema({
   },
 });
 
-export const FootballClubs = mongoose.model(
+export const footballClubs = mongoose.model(
   footballClubsCollectionName,
   footballClubsSchema
 );

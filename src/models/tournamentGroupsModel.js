@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { now } from "mongoose";
 import { tournamenGroupsCollectionName } from "../common/index.js";
 
 const tournamentGroupSchema = new mongoose.Schema({
@@ -14,11 +14,11 @@ const tournamentGroupSchema = new mongoose.Schema({
   },
   created_at: {
     type: Date,
-    required: true,
+    default: Date.now,
   },
 });
 
-export const TournamentGroup = mongoose.model(
+export const tournamentGroup = mongoose.model(
   tournamenGroupsCollectionName,
   tournamentGroupSchema
 );

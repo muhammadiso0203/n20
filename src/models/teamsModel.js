@@ -24,4 +24,4 @@ const teamSchema = new mongoose.Schema({
   },
 });
 
-export const Team = mongoose.model(teamsCollectionName, teamSchema);
+export const team = mongoose.model(teamsCollectionName, teamSchema);

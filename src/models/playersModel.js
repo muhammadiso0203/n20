@@ -27,4 +27,4 @@ const playerSchema = new mongoose.Schema({
   },
 });
 
-export const Player = mongoose.model(playersCollectionName, playerSchema);
+export const player = mongoose.model(playersCollectionName, playerSchema);
