@@ -1,0 +1,6 @@
+export * from "./footballClubsRouter.js"
+export * from "./matchFixturesRouter.js"
+export * from "./teamsRouter.js"
+export * from "./tournamentGroupsRouter.js"
+export * from "./tournamentsRouter.js"
+export * from "./playersRouter.js"

@@ -1,0 +1,6 @@
+export * from "./footballClubsModel.js"
+export * from "./matchFixturesModel.js"
+export * from "./playersModel.js"
+export * from "./teamsModel.js"
+export * from "./tournamentGroupsModel.js"
+export * from "./tournamentsModel.js"
