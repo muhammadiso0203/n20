@@ -1,3 +1,4 @@
+import { mongoose } from "mongoose";
 import { footballClubs } from "../models/index.js";
 
 export const footballClubsController = {
@@ -18,6 +19,10 @@ export const footballClubsController = {
   findAll: async (req, res, next) => {
     try {
       const allFootballClubs = await footballClubs.find();
+
+      if (allFootballClubs.length === 0)
+        return res.status(404).send(`Football Clubs not found`);
+
       res.json(allFootballClubs);
     } catch (error) {
       next(error);

@@ -1,3 +1,4 @@
+import { mongoose } from "mongoose";
 import { matchFixture } from "../models/index.js";
 
 export const matchFixturesController = {
@@ -18,6 +19,10 @@ export const matchFixturesController = {
   findAll: async (req, res, next) => {
     try {
       const allMatchFixture = await matchFixture.find();
+
+      if (allMatchFixture.length === 0)
+        return res.status(404).send(`Match Fixtures not found`);
+
       res.json(allMatchFixture);
     } catch (error) {
       next(error);

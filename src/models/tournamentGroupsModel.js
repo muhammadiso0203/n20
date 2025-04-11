@@ -1,5 +1,8 @@
 import mongoose, { now } from "mongoose";
-import { tournamenGroupsCollectionName } from "../common/index.js";
+import {
+  tournamenGroupsCollectionName,
+  tournamentsCollectionName,
+} from "../common/index.js";
 
 const tournamentGroupSchema = new mongoose.Schema({
   group_name: {
@@ -9,7 +12,7 @@ const tournamentGroupSchema = new mongoose.Schema({
   },
   tournament_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Tournament",
+    ref: tournamentsCollectionName,
     required: true,
   },
   created_at: {

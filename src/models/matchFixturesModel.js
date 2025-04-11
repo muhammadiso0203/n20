@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
-import { matchFixturesCollectionName } from "../common/index.js";
+import {
+  matchFixturesCollectionName,
+  teamsCollectionName,
+  tournamentsCollectionName,
+} from "../common/index.js";
 
 const matchFixtureSchema = new mongoose.Schema({
   match_date: {
@@ -13,12 +17,12 @@ const matchFixtureSchema = new mongoose.Schema({
   },
   home_team_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Team",
+    ref: teamsCollectionName,
     required: true,
   },
   away_team_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Team",
+    ref: teamsCollectionName,
     required: true,
   },
   home_score: {
@@ -31,7 +35,7 @@ const matchFixtureSchema = new mongoose.Schema({
   },
   tournament_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Tournament",
+    ref: tournamentsCollectionName,
     required: true,
   },
   match_status: {

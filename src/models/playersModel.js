@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { playersCollectionName } from "../common/index.js";
+import { playersCollectionName, teamsCollectionName } from "../common/index.js";
 
 const playerSchema = new mongoose.Schema({
   full_name: {
@@ -18,7 +18,7 @@ const playerSchema = new mongoose.Schema({
   },
   team_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Team",
+    ref: teamsCollectionName,
     required: true,
   },
   jersey_number: {

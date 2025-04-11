@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
-import { teamsCollectionName } from "../common/index.js";
+import {
+  footballClubsCollectionName,
+  teamsCollectionName,
+  tournamenGroupsCollectionName,
+} from "../common/index.js";
 
 const teamSchema = new mongoose.Schema({
   team_name: {
@@ -9,12 +13,12 @@ const teamSchema = new mongoose.Schema({
   },
   club_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "FootballClub",
+    ref: footballClubsCollectionName,
     required: true,
   },
   group_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "TournamentGroup",
+    ref: tournamenGroupsCollectionName,
     required: true,
   },
   coach_name: {
