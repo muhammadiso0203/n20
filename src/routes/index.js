@@ -1,0 +1,5 @@
+export * from "./authRouter.js"
+export * from "./categoryRouter.js"
+export * from "./orderCategory.js"
+export * from "./productRouter.js"
+export * from "./userRouter.js"
