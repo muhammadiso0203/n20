@@ -18,7 +18,9 @@ export const orderController = {
   },
   findAll: async (req, res, next) => {
     try {
-      const allOrders = await Order.find();
+      const allOrders = await Order.find()
+        .populate("user_id")
+        .populate("product_id");
 
       if (allOrders.length === 0)
         return res.status(404).json({ message: "Orders not found" });

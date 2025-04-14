@@ -19,7 +19,7 @@ export const productController = {
   },
   findAll: async (req, res, next) => {
     try {
-      const allProducts = await Product.find();
+      const allProducts = await Product.find().populate("category_id");
 
       if (allProducts.length === 0)
         return res.status(404).json({ message: "Products not found" });
@@ -91,7 +91,8 @@ export const productController = {
 
       const product = await Product.findByIdAndDelete(id);
 
-      if (!product) return res.status(404).json({ message: "Product not found" });
+      if (!product)
+        return res.status(404).json({ message: "Product not found" });
 
       res.json({ message: "Product successfully deleted" });
     } catch (err) {
