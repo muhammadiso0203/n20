@@ -19,7 +19,10 @@ export const productController = {
   },
   findAll: async (req, res, next) => {
     try {
-      const allProducts = await Product.find().populate("category_id");
+      const allProducts = await Product.find()
+        .populate("category_id")
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
 
       if (allProducts.length === 0)
         return res.status(404).json({ message: "Products not found" });

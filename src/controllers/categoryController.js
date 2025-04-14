@@ -19,7 +19,11 @@ export const categoryController = {
   },
   findAll: async (req, res, next) => {
     try {
-      const allCategory = await Category.find();
+      const { page, limit } = req.query;
+
+      const allCategory = await Category.find()
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
 
       if (allCategory.length === 0)
         return res.status(404).json({ message: "Categories not found" });

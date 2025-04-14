@@ -20,7 +20,9 @@ export const orderController = {
     try {
       const allOrders = await Order.find()
         .populate("user_id")
-        .populate("product_id");
+        .populate("product_id")
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
 
       if (allOrders.length === 0)
         return res.status(404).json({ message: "Orders not found" });

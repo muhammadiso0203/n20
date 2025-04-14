@@ -6,8 +6,8 @@ import { validateBody } from "../middleware/index.js";
 const router = Router();
 
 router
-  .post("/profile", validateBody(authSchema.signIn), userController.profile)
-  .put("/profile/:id", validateBody(authUpdateSchema), userController.update)
-  .delete("/profile/:id", userController.delete);
+  .post("/", validateBody(authSchema.signIn), userController.profile)
+  .put("/:id", validateBody(authUpdateSchema), userController.update)
+  .delete("/:id", userController.delete);
 
 export { router as userRouter };

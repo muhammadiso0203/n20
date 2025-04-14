@@ -6,14 +6,10 @@ import { categorySchema, categoryUpdateSchema } from "../validations/index.js";
 const router = Router();
 
 router
-  .get("/category", categoryController.findAll)
-  .get("/category/:id", categoryController.findOne)
-  .post("/category", validateBody(categorySchema), categoryController.create)
-  .put(
-    "/category/:id",
-    validateBody(categoryUpdateSchema),
-    categoryController.update
-  )
-  .delete("/category/:id", categoryController.delete);
+  .get("/", categoryController.findAll)
+  .get("/:id", categoryController.findOne)
+  .post("/", validateBody(categorySchema), categoryController.create)
+  .put("/:id", validateBody(categoryUpdateSchema), categoryController.update)
+  .delete("/:id", categoryController.delete);
 
 export { router as categoryRouter };
