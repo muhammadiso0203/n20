@@ -6,7 +6,16 @@ import { authController } from "../controllers/index.js";
 const router = Router();
 
 router
-  .post("/signup", validateBody(authSchema.signUp), authController.signUp)
-  .post("/signin", validateBody(authSchema.signIn), authController.signIn);
+  .get("/profile", authController.profile)
+  .post(
+    "/signup",
+    validateBody(authSchema.signUp),
+    authController.signUp
+  )
+  .post(
+    "/signin",
+    validateBody(authSchema.signIn),
+    authController.signIn
+  );
 
 export { router as AuthRouter };

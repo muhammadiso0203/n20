@@ -19,10 +19,7 @@ export const productController = {
   },
   findAll: async (req, res, next) => {
     try {
-      const allProducts = await Product.find()
-        .populate("category_id")
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
+      const allProducts = await Product.find().populate("category_id");
 
       if (allProducts.length === 0)
         return res.status(404).json({ message: "Products not found" });
@@ -34,6 +31,7 @@ export const productController = {
   },
   create: async (req, res, next) => {
     try {
+      
       const { name, price, description, stock, category_id } = req.body;
 
       if (!name || !price || !description || !stock || !category_id)

@@ -14,7 +14,7 @@ const orderSchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: collections.user,
-      required: true,
+      required: false,
     },
     product_id: {
       type: mongoose.Schema.Types.ObjectId,

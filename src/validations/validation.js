@@ -33,7 +33,6 @@ export const categoryUpdateSchema = categorySchema.partial();
 export const orderSchema = z.object({
   status: z.enum(["processing", "shipped", "delivered", "rejected"]),
   total: z.number(),
-  user_id: z.string(),
   product_id: z.string(),
 });
 

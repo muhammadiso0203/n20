@@ -39,4 +39,12 @@ export const authController = {
       next(err);
     }
   },
+
+  profile:(req,res,next)=>{
+    try {
+      res.json(req.user)
+    } catch (error) {
+      next(error)
+    }
+  }
 };

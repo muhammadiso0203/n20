@@ -18,11 +18,7 @@ export const orderController = {
   },
   findAll: async (req, res, next) => {
     try {
-      const allOrders = await Order.find()
-        .populate("user_id")
-        .populate("product_id")
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
+      const allOrders = await Order.find();
 
       if (allOrders.length === 0)
         return res.status(404).json({ message: "Orders not found" });
@@ -34,15 +30,19 @@ export const orderController = {
   },
   create: async (req, res, next) => {
     try {
+      const user = req.user;
+
+      if (!user) return res.status(401).json({ message: "User not found" });
+
       const { status, total, user_id, product_id } = req.body;
 
-      if (!status || !total || !user_id || !product_id)
+      if (!status || !total  || !product_id)
         return res.status(400).json({ message: "All data is required" });
-
+      
       const newOrder = new Order({
         status,
         total,
-        user_id,
+        user_id: user._id,
         product_id,
       });
 
@@ -54,6 +54,10 @@ export const orderController = {
   },
   update: async (req, res, next) => {
     try {
+      const user = req.user;
+
+      if (!user) return res.status(401).json({ message: "User not found" });
+
       const { id } = req.params;
 
       if (!id) return res.status(400).json({ message: "ID is required" });
@@ -70,7 +74,7 @@ export const orderController = {
         {
           status,
           total,
-          user_id,
+          user_id: user._id,
           product_id,
         },
         { new: true }
