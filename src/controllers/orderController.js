@@ -36,9 +36,9 @@ export const orderController = {
 
       const { status, total, user_id, product_id } = req.body;
 
-      if (!status || !total  || !product_id)
+      if (!status || !total || !product_id)
         return res.status(400).json({ message: "All data is required" });
-      
+
       const newOrder = new Order({
         status,
         total,
