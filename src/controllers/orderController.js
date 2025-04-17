@@ -34,7 +34,7 @@ export const orderController = {
 
       if (!user) return res.status(401).json({ message: "User not found" });
 
-      const { status, total, user_id, product_id } = req.body;
+      const { status, total, product_id } = req.body;
 
       if (!status || !total || !product_id)
         return res.status(400).json({ message: "All data is required" });
