@@ -12,7 +12,7 @@ export const categoryController = {
       if (!category)
         return res.status(404).json({ message: "Category not found" });
 
-      res.json(category);
+      res.status(200).json(category);
     } catch (err) {
       next(err);
     }
@@ -25,10 +25,7 @@ export const categoryController = {
         .limit(limit * 1)
         .skip((page - 1) * limit);
 
-      if (allCategory.length === 0)
-        return res.status(404).json({ message: "Categories not found" });
-
-      res.json(allCategory);
+      res.status(200).json(allCategory);
     } catch (err) {
       next(err);
     }
@@ -57,7 +54,7 @@ export const categoryController = {
     try {
       const { id } = req.params;
 
-      if (!id) return res.status(400).json({ message: "ID is required" });
+      if (!id) return res.status(404).json({ message: "ID is required" });
 
       const { name, slug, description, isActive } = req.body;
 
@@ -80,7 +77,7 @@ export const categoryController = {
       if (!updatedCategory)
         return res.status(404).json({ message: "Updated category not found" });
 
-      res.json({ message: "Category successfully updated" });
+      res.status(200).json({ message: "Category successfully updated" });
     } catch (err) {
       next(err);
     }
@@ -96,7 +93,7 @@ export const categoryController = {
       if (!category)
         return res.status(404).json({ message: "Category not found" });
 
-      res.json({ message: "Category successfully deleted" });
+      res.status(200).json({ message: "Category successfully deleted" });
     } catch (err) {
       next(err);
     }

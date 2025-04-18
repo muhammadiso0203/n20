@@ -1,3 +1,4 @@
+import { generateToken } from "../library/index.js";
 import { User } from "../models/index.js";
 
 export const authController = {
@@ -10,7 +11,7 @@ export const authController = {
       ).exec();
 
       if (user) {
-        return res.send("User already exists!;");
+        return res.status(409).send("User already exists!;");
       }
 
       const newUser = new User(body);
@@ -32,19 +33,28 @@ export const authController = {
       const isMatch = await user.isValidPassword(password);
 
       if (!isMatch)
-        return res.status(401).json({ message: `Invalid credentials` });
+        return res.status(400).json({ message: `Invalid credentials` });
 
-      res.json(user);
+      const payload = {
+        sub: user._id,
+        name: user.full_name,
+      };
+
+      const token = generateToken(payload);
+
+      res.status(200).json({ message: "ok", token });
     } catch (err) {
       next(err);
     }
   },
 
-  profile:(req,res,next)=>{
+  profile: (req, res, next) => {
     try {
-      res.json(req.user)
+      if (!req.user) return res.status(401).json({ message: "User not found" });
+
+      res.status(200).json(req.user);
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }
+  },
 };

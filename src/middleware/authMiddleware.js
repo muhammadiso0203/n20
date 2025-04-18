@@ -1,32 +1,24 @@
+import { verifyToken } from "../library/index.js";
 import { User } from "../models/index.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    const str = (req.headers.authorization || "").split(" ")[1] || "";
+    const [type, token] = (req.headers.authorization || "").split(" ") || "";
 
-    const [userEmail, userPassword] = Buffer.from(str, "base64")
-      .toString()
-      .split(":");
+    if (type !== "Bearer") {
+      return res.status(403).json({ message: "Authentication required" });
+    }
 
-    const user = await User.findOne({ email: userEmail }).exec();
+    const { decoded } = verifyToken(token);
+
+    const user = await User.findById(decoded.sub);
 
     if (!user)
       return res.status(401).json({ message: "Authentication failed" });
 
-    const isValidPassword = await user.isValidPassword(userPassword);
-
-    if (
-      userEmail &&
-      userPassword &&
-      userEmail === user.email &&
-      isValidPassword
-    ) {
-      req.user = user;
-      next();
-      return;
-    }
-
-    res.status(401).send("Authentication failed");
+    req.user = user;
+    next();
+    return;
   } catch (error) {
     next(error);
   }

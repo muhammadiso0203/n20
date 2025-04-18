@@ -7,14 +7,14 @@ export const userController = {
 
       const user = await User.findOne({ email });
 
-      if (!user) return res.status(404).json({ message: "User not found" });
+      if (!user) return res.status(401).json({ message: "User not found" });
 
       const isMatch = await user.isValidPassword(password);
 
       if (!isMatch)
         return res.status(401).json({ message: `Invalid credentials` });
 
-      res.json(user);
+      res.status(200).json(user);
     } catch (err) {
       next(err);
     }
@@ -41,7 +41,7 @@ export const userController = {
 
       if (!user) return res.status(401).json({ message: "User not found" });
 
-      res.json({ message: "User successfully updated" });
+      res.status(200).json({ message: "User successfully updated" });
     } catch (err) {
       next(err);
     }
@@ -56,7 +56,7 @@ export const userController = {
 
       if (!user) return res.status(401).json({ message: "User not found" });
 
-      res.json({ message: "User successfully deleted" });
+      res.status(200).json({ message: "User successfully deleted" });
     } catch (err) {
       next(err);
     }

@@ -6,7 +6,12 @@ import { authMiddleware, validateBody } from "../middleware/index.js";
 const router = Router();
 
 router
-  .post("/", validateBody(authSchema.signIn), userController.profile)
+  .post(
+    "/",
+    authMiddleware,
+    validateBody(authSchema.signIn),
+    userController.profile
+  )
   .put(
     "/:id",
     authMiddleware,

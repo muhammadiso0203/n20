@@ -5,13 +5,13 @@ export const orderController = {
     try {
       const { id } = req.params;
 
-      if (!id) return res.status(400).json({ message: "ID is required" });
+      if (!id) return res.status(404).json({ message: "ID is required" });
 
       const order = await Order.findById(id);
 
       if (!order) return res.status(404).json({ message: "Order not found" });
 
-      res.json(order);
+      res.status(200).json(order);
     } catch (err) {
       next(err);
     }
@@ -20,10 +20,7 @@ export const orderController = {
     try {
       const allOrders = await Order.find();
 
-      if (allOrders.length === 0)
-        return res.status(404).json({ message: "Orders not found" });
-
-      res.json(allOrders);
+      res.status(200).json(allOrders);
     } catch (err) {
       next(err);
     }
@@ -60,7 +57,7 @@ export const orderController = {
 
       const { id } = req.params;
 
-      if (!id) return res.status(400).json({ message: "ID is required" });
+      if (!id) return res.status(404).json({ message: "ID is required" });
 
       const { status, total, user_id, product_id } = req.body;
 
@@ -83,7 +80,7 @@ export const orderController = {
       if (!updatedOrder)
         return res.status(404).json({ message: "Order not found" });
 
-      res.json({ message: "Order successfully updated" });
+      res.status(200).json({ message: "Order successfully updated" });
     } catch (err) {
       next(err);
     }
@@ -92,13 +89,13 @@ export const orderController = {
     try {
       const { id } = req.params;
 
-      if (!id) return res.status(400).json({ message: "ID is required" });
+      if (!id) return res.status(404).json({ message: "ID is required" });
 
       const order = await Order.findByIdAndDelete(id);
 
       if (!order) return res.status(404).json({ message: "Order not found" });
 
-      res.json({ message: "Order successfully deleted" });
+      res.status(200).json({ message: "Order successfully deleted" });
     } catch (err) {
       next(err);
     }
