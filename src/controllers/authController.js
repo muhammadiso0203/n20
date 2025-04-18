@@ -4,9 +4,13 @@ import { User } from "../models/index.js";
 export const authController = {
   signUp: async (req, res, next) => {
     try {
-      const body = req.body;
+      const { full_name, email, password } = req.body;
+
+      if (!full_name || !email || !password)
+        return res.status(400).json({ message: "All data is required" });
+
       const user = await User.findOne(
-        { email: body.email },
+        { email: email },
         "email _id"
       ).exec();
 
@@ -14,10 +18,10 @@ export const authController = {
         return res.status(409).send("User already exists!;");
       }
 
-      const newUser = new User(body);
+      const newUser = new User({ full_name, email, password });
 
       await newUser.save();
-      res.status(201).send(newUser);
+      res.status(201).json({ full_name, email });
     } catch (err) {
       next(err);
     }
