@@ -5,7 +5,7 @@ export const productController = {
     try {
       const { id } = req.params;
 
-      if (!id) return res.status(404).json({ message: "ID is required" });
+      if (!id) return res.status(400).json({ message: "ID is required" });
 
       const product = await Product.findById(id);
 
@@ -48,7 +48,7 @@ export const productController = {
     try {
       const { id } = req.params;
 
-      if (!id) return res.status(404).json({ message: "ID is required" });
+      if (!id) return res.status(400).json({ message: "ID is required" });
 
       const { name, price, description, stock, category_id } = req.body;
 
@@ -76,7 +76,7 @@ export const productController = {
     try {
       const { id } = req.params;
 
-      if (!id) return res.status(404).json({ message: "ID is required" });
+      if (!id) return res.status(400).json({ message: "ID is required" });
 
       const product = await Product.findByIdAndDelete(id);
 

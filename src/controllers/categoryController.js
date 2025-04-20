@@ -51,7 +51,7 @@ export const categoryController = {
     try {
       const { id } = req.params;
 
-      if (!id) return res.status(404).json({ message: "ID is required" });
+      if (!id) return res.status(400).json({ message: "ID is required" });
 
       const { name, slug, description, isActive } = req.body;
 

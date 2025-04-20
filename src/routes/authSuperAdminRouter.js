@@ -5,16 +5,12 @@ import {
   roleGuard,
   authMiddleware,
 } from "../middleware/index.js";
-import {
-  adminValidation,
-  adminUpdateValidation,
-} from "../validations/index.js";
+import { adminValidation } from "../validations/index.js";
 
 const router = Router();
 
 router.post(
   "/signin",
-  
   validateBody(adminValidation),
   authSuperAdminController.signIn
 );
@@ -22,7 +18,7 @@ router.post(
   "/profile",
   authMiddleware,
   roleGuard("superadmin"),
-  validateBody(adminUpdateValidation),
+  validateBody(adminValidation),
   authSuperAdminController.profile
 );
 

@@ -7,7 +7,7 @@ export const userController = {
 
       const user = await User.findOne({ email });
 
-      if (!user) return res.status(401).json({ message: "User not found" });
+      if (!user) return res.status(404).json({ message: "User not found" });
 
       const isMatch = await user.isValidPassword(password);
 
@@ -23,7 +23,7 @@ export const userController = {
   update: async (req, res, next) => {
     const { id } = req.params;
 
-    if (!id) return res.status(404).json({ message: "ID is required" });
+    if (!id) return res.status(400).json({ message: "ID is required" });
 
     try {
       const { full_name, email, password } = req.body;
@@ -34,7 +34,7 @@ export const userController = {
         password,
       });
 
-      if (!user) return res.status(401).json({ message: "User not found" });
+      if (!user) return res.status(404).json({ message: "User not found" });
 
       res.status(200).json({ message: "User successfully updated" });
     } catch (err) {
@@ -44,12 +44,12 @@ export const userController = {
   delete: async (req, res, next) => {
     const { id } = req.params;
 
-    if (!id) return res.status(404).json({ message: "ID is required" });
+    if (!id) return res.status(400).json({ message: "ID is required" });
 
     try {
       const user = await User.findByIdAndDelete(id);
 
-      if (!user) return res.status(401).json({ message: "User not found" });
+      if (!user) return res.status(404).json({ message: "User not found" });
 
       res.status(200).json({ message: "User successfully deleted" });
     } catch (err) {

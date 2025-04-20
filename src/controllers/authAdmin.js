@@ -45,7 +45,7 @@ export const authAdminController = {
       const isMatch = await admin.isValidPassword(password);
 
       if (!isMatch) {
-        return res.status(403).json({ message: "Access denied" });
+        return res.status(401).json({ message: "Invalid password" });
       }
 
       const payload = {
@@ -61,5 +61,25 @@ export const authAdminController = {
     }
   },
 
-  profile: () => {},
+  profile: async (req, res, next) => {
+    try {
+      const { username, password } = req.body;
+
+      const admin = await Admin.findOne({ username });
+
+      if (!admin) {
+        return res.status(401).json({ message: "Admin not found" });
+      }
+
+      const isMatch = await admin.isValidPassword(password);
+
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
+
+      res.status(200).json({ message: "ok", admin });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

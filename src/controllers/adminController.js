@@ -73,7 +73,7 @@ export const adminController = {
       const existing = await Admin.findOne({ username });
 
       if (!existing)
-        return res.status(401).json({ message: "Admin not found" });
+        return res.status(404).json({ message: "Admin not found" });
 
       if (
         req.user.role !== "superadmin" &&
@@ -86,11 +86,7 @@ export const adminController = {
       if (!isMatch)
         return res.status(403).json({ message: "Invalid password" });
 
-      const updatedAdmin = await existing.findOneAndUpdate({
-        username,
-        password,
-        role,
-      });
+      await Admin.updateOne({ username }, { password, role });
 
       res.status(200).json({
         message: "Admin successfully updated",
