@@ -30,9 +30,6 @@ export const productController = {
     try {
       const { name, price, description, stock, category_id } = req.body;
 
-      if (!name || !price || !description || !stock || !category_id)
-        return res.status(400).json({ message: "All data is required" });
-
       const newProduct = new Product({
         name,
         price,
@@ -54,11 +51,6 @@ export const productController = {
       if (!id) return res.status(404).json({ message: "ID is required" });
 
       const { name, price, description, stock, category_id } = req.body;
-
-      if (!name && !price && !description && !stock && !category_id)
-        return res
-          .status(400)
-          .json({ message: "At least one data is required" });
 
       const updatedProduct = await Product.findByIdAndUpdate(
         id,

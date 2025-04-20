@@ -28,11 +28,6 @@ export const userController = {
     try {
       const { full_name, email, password } = req.body;
 
-      if (!full_name && !email && !password)
-        return res
-          .status(400)
-          .json({ message: "At least one data is required" });
-
       const user = await User.findByIdAndUpdate(id, {
         full_name,
         email,

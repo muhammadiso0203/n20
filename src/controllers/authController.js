@@ -6,19 +6,13 @@ export const authController = {
     try {
       const { full_name, email, password } = req.body;
 
-      if (!full_name || !email || !password)
-        return res.status(400).json({ message: "All data is required" });
-
-      const user = await User.findOne(
-        { email: email },
-        "email _id"
-      ).exec();
+      const user = await User.findOne({ email: email }, "email _id").exec();
 
       if (user) {
         return res.status(409).send("User already exists!;");
       }
 
-      const newUser = new User({ full_name, email, password });
+      const newUser = new User({ full_name, email, password, role: "user" });
 
       await newUser.save();
       res.status(201).json({ full_name, email });
@@ -42,6 +36,7 @@ export const authController = {
       const payload = {
         sub: user._id,
         name: user.full_name,
+        role: "user",
       };
 
       const token = generateToken(payload);

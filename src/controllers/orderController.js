@@ -33,9 +33,6 @@ export const orderController = {
 
       const { status, total, product_id } = req.body;
 
-      if (!status || !total || !product_id)
-        return res.status(400).json({ message: "All data is required" });
-
       const newOrder = new Order({
         status,
         total,
@@ -59,12 +56,7 @@ export const orderController = {
 
       if (!id) return res.status(404).json({ message: "ID is required" });
 
-      const { status, total, user_id, product_id } = req.body;
-
-      if (!status && !total && !user_id && !product_id)
-        return res
-          .status(400)
-          .json({ message: "At least one data is required" });
+      const { status, total, product_id } = req.body;
 
       const updatedOrder = await Order.findByIdAndUpdate(
         id,

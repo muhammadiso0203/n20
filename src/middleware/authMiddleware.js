@@ -1,5 +1,5 @@
 import { verifyToken } from "../library/index.js";
-import { User } from "../models/index.js";
+import { Admin, User } from "../models/index.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
@@ -10,15 +10,29 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     const { decoded } = verifyToken(token);
+    const { sub, role } = decoded;
+        
+    let user;
 
-    const user = await User.findById(decoded.sub);
+    if (role === "admin" || role === "superadmin") {
+      user = await Admin.findById(sub);
+    } else if (role === "user") {
+      user = await User.findById(sub);
+    } else {
+      return res.status(403).json({ message: "Unknown role" });
+    }
 
-    if (!user)
+    if (!user) {
       return res.status(401).json({ message: "Authentication failed" });
+    }
 
-    req.user = user;
+    req.user = {
+      id: user._id,
+      email: user.email,
+      role: role,
+    };
+
     next();
-    return;
   } catch (error) {
     next(error);
   }

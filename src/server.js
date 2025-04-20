@@ -4,7 +4,7 @@ import cors from "cors";
 import { mongoConnection } from "./db/index.js";
 import { mainRouter } from "./routes/index.js";
 
-mongoConnection();
+await mongoConnection();
 const app = express();
 const PORT = process.env.PORT;
 

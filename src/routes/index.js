@@ -1,3 +1,6 @@
+export * from "./authAdminRouter.js"
+export * from "./authSuperAdminRouter.js"
+export * from "./adminRouter.js"
 export * from "./authRouter.js"
 export * from "./categoryRouter.js"
 export * from "./orderCategory.js"

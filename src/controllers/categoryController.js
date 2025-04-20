@@ -34,9 +34,6 @@ export const categoryController = {
     try {
       const { name, slug, description, isActive } = req.body;
 
-      if (!name || !slug || !description || !isActive)
-        return res.status(400).json({ message: "All data is required" });
-
       const newCategory = new Category({
         name,
         slug,
@@ -57,11 +54,6 @@ export const categoryController = {
       if (!id) return res.status(404).json({ message: "ID is required" });
 
       const { name, slug, description, isActive } = req.body;
-
-      if (!name && !slug && !description && !isActive)
-        return res
-          .status(400)
-          .json({ message: "At least one data is required" });
 
       const updatedCategory = await Category.findByIdAndUpdate(
         id,
