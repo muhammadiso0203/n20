@@ -9,13 +9,7 @@ import { adminController } from "../controllers/index.js";
 
 const router = Router();
 
-router.get(
-  "/",
-  authMiddleware,
-  roleGuard("superadmin"),
-  validateBody(adminValidation),
-  adminController.find
-);
+router.get("/", authMiddleware, roleGuard("superadmin"), adminController.find);
 router.post(
   "/",
   authMiddleware,
@@ -26,9 +20,16 @@ router.post(
 router.put(
   "/",
   authMiddleware,
-  roleGuard("admin", "superadmin"),
+  roleGuard("superadmin"),
   validateBody(adminValidation),
   adminController.update
+);
+router.delete(
+  "/",
+  authMiddleware,
+  roleGuard("superadmin"),
+  validateBody(adminValidation),
+  adminController.delete
 );
 
 export { router as adminRouter };

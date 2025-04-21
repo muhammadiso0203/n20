@@ -33,15 +33,10 @@ export const authSuperAdminController = {
     try {
       const { username, password } = req.body;
 
-      const superAdmin = await Admin.findOne({ username });
+      const superAdmin = await Admin.findOne({ username, password });
 
       if (!superAdmin)
         return res.status(401).json({ message: "Super admin not found" });
-
-      const isMatch = await superAdmin.isValidPassword(password);
-
-      if (!isMatch)
-        return res.status(401).json({ message: "Invalid password" });
 
       res.status(200).json({ message: "ok", superAdmin: superAdmin });
     } catch (error) {

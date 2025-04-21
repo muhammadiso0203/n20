@@ -68,7 +68,7 @@ export const adminController = {
 
   update: async (req, res, next) => {
     try {
-      const { username, password, role } = req.body;
+      const { username, role } = req.body;
 
       const existing = await Admin.findOne({ username });
 
@@ -81,20 +81,28 @@ export const adminController = {
       )
         return res.status(403).json({ message: "Access denied" });
 
-      const isMatch = await existing.isValidPassword(password);
-
-      if (!isMatch)
-        return res.status(403).json({ message: "Invalid password" });
-
-      await Admin.updateOne({ username }, { password, role });
+      await Admin.updateOne({ username }, { role });
 
       res.status(200).json({
         message: "Admin successfully updated",
-        admin: {
-          username: updatedAdmin.username,
-          role: updatedAdmin.role,
-        },
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  delete: async (req, res, next) => {
+    try {
+      const { username } = req.body;
+
+      const existing = await Admin.findOne({ username });
+
+      if (!existing) {
+        return res.status(404).json({ message: `Admin not found` });
+      }
+
+      await existing.deleteOne();
+      res.status(200).json({ message: "Admin successfully deleted" });
     } catch (error) {
       next(error);
     }
