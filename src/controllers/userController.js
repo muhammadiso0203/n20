@@ -1,59 +1,60 @@
-import { User } from "../models/index.js";
+import { User } from "../model/index.js";
+import { generateToken, hashPassword, verifyPassword } from "../utils/index.js";
 
 export const userController = {
-  profile: async (req, res, next) => {
+  signUp: async (req, res, next) => {
+    try {
+      const { fullname, email, password, role } = req.body;
+
+      const existing = await User.findOne({ email });
+
+      if (existing) {
+        return res.status(409).json({ message: "User already exists" });
+      }
+      const hashedPassword = hashPassword(password);
+
+      const newUser = new User({
+        fullname,
+        email,
+        password: hashedPassword,
+        role,
+      });
+
+      await newUser.save();
+      res.status(201).json({
+        message: "ok",
+        user: {
+          fullname,
+          email,
+          role,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  signIn: async (req, res, next) => {
     try {
       const { email, password } = req.body;
 
-      const user = await User.findOne({ email });
+      const existing = await User.findOne({ email });
 
-      if (!user) return res.status(404).json({ message: "User not found" });
+      if (!existing) {
+        return res.status(401).json({ message: "User not found" });
+      }
 
-      const isMatch = await user.isValidPassword(password);
+      const hashPassword = verifyPassword(password);
 
-      if (!isMatch)
-        return res.status(401).json({ message: `Invalid credentials` });
+      if (!hashPassword) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
 
-      res.status(200).json(user);
-    } catch (err) {
-      next(err);
-    }
-  },
+      const token = generateToken(existing._id);
 
-  update: async (req, res, next) => {
-    const { id } = req.params;
-
-    if (!id) return res.status(400).json({ message: "ID is required" });
-
-    try {
-      const { full_name, email, password } = req.body;
-
-      const user = await User.findByIdAndUpdate(id, {
-        full_name,
-        email,
-        password,
-      });
-
-      if (!user) return res.status(404).json({ message: "User not found" });
-
-      res.status(200).json({ message: "User successfully updated" });
-    } catch (err) {
-      next(err);
-    }
-  },
-  delete: async (req, res, next) => {
-    const { id } = req.params;
-
-    if (!id) return res.status(400).json({ message: "ID is required" });
-
-    try {
-      const user = await User.findByIdAndDelete(id);
-
-      if (!user) return res.status(404).json({ message: "User not found" });
-
-      res.status(200).json({ message: "User successfully deleted" });
-    } catch (err) {
-      next(err);
+      res.status(200).json({ message: "ok", token });
+    } catch (error) {
+      next(error);
     }
   },
 };

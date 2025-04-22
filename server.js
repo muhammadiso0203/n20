@@ -1,17 +1,16 @@
 import express from "express";
 import cors from "cors";
 
-import { mongoConnection } from "./db/index.js";
-import { mainRouter } from "./routes/index.js";
+import { mongoConnection } from "./src/config/index.js";
+import { errorHandler } from "./src/middlewares/index.js";
 
-await mongoConnection();
+mongoConnection();
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 // middleware
 app.use(express.json());
 app.use(cors());
-
-app.use("/product", mainRouter);
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
