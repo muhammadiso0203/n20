@@ -1,3 +1,4 @@
+export * from "./admin.route.js"
 export * from "./comment.route.js"
 export * from "./post.route.js"
 export * from "./user.route.js"

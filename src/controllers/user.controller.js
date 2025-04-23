@@ -1,12 +1,18 @@
 import { User } from "../models/userModel.js";
-import { catchError, decode, encode, userValidator } from "../utils/index.js";
+import {
+  catchError,
+  decode,
+  encode,
+  generateToken,
+  userValidator,
+} from "../utils/index.js";
 
 export class UserController {
   async signUpUser(req, res) {
     try {
       const { error, value } = userValidator(req.body);
       if (error) {
-        throw new Error("Error in signing up user:", error.message);
+        throw new Error(`Error in signing up user:`, error.message);
       }
 
       const { username, email, password } = value;
@@ -23,6 +29,7 @@ export class UserController {
         username,
         email,
         decodedPassword,
+        role: "user",
       });
       await newUser.save();
 
@@ -55,10 +62,17 @@ export class UserController {
         throw new Error("Error in encoding user password");
       }
 
+      const payload = {
+        sub: existing._id,
+        role: "user",
+      };
+
+      const token = generateToken(payload);
+
       return res.status(200).json({
         statusCode: 200,
         message: "success",
-        user: existing,
+        token,
       });
     } catch (error) {
       catchError(error, res);

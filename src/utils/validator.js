@@ -5,10 +5,22 @@ const user = new j.object({
   username: j.string().min(5).max(20).required(),
   email: j.string().email().required(),
   password: j.string().min(5).max(20).required(),
+  role: j.valid("user").optional()
 });
 
 export const userValidator = (data) => {
   return user.validate(data);
+};
+
+const admin = new j.object({
+  username: j.string().min(5).max(20).required(),
+  email: j.string().email().required(),
+  password: j.string().min(5).max(20).required(),
+  role: j.string().valid("admin", "superadmin").default("admin"),
+});
+
+export const adminValidator = (data) => {
+  return admin.validate(data);
 };
 
 // Post validator
