@@ -7,7 +7,7 @@ export class CommentController {
       const { error, value } = commentValidator(req.body);
 
       if (error) {
-        throw new Error(`Error in creating comment: ${error.message}`);
+        catchError(res, 400, `Error in creating comment`);
       }
 
       const { post_id, user_id, content } = value;
@@ -18,7 +18,7 @@ export class CommentController {
         .status(201)
         .json({ statusCode: 201, message: "success", data: newComment });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -30,7 +30,7 @@ export class CommentController {
         .status(200)
         .json({ statusCode: 200, message: "success", data: allComments });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -39,19 +39,19 @@ export class CommentController {
       const id = req.params.id;
 
       if (!id) {
-        throw new Error("ID not found");
+        catchError(res, 400, `ID not found`);
       }
       const comment = await Comment.findById(id);
 
       if (!comment) {
-        throw new Error(`Comment not found`);
+        catchError(res, 404, `Comment not found`);
       }
 
       return res
         .status(200)
         .json({ statusCode: 200, message: "success", data: comment });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -60,13 +60,13 @@ export class CommentController {
       const id = req.params.id;
 
       if (!id) {
-        throw new Error("ID not found");
+        catchError(res, 400, `ID not found`);
       }
 
       const comment = await Comment.findById(id);
 
       if (!comment) {
-        throw new Error(`Comment not found`);
+        catchError(res, 404, `Comment not found`);
       }
 
       const updatedComment = await Comment.findByIdAndUpdate(id, req.body, {
@@ -77,7 +77,7 @@ export class CommentController {
         .status(200)
         .json({ statusCode: 200, message: "success", data: updatedComment });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -86,13 +86,13 @@ export class CommentController {
       const id = req.params.id;
 
       if (!id) {
-        throw new Error("ID not found");
+        catchError(res, 400, `ID not found`);
       }
 
       const comment = await Comment.findById(id);
 
       if (!comment) {
-        throw new Error(`Comment not found`);
+        catchError(res, 404, `Comment not found`);
       }
 
       await Comment.findByIdAndDelete(id);
@@ -100,7 +100,7 @@ export class CommentController {
         .status(200)
         .json({ statusCode: 200, message: "success", data: {} });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 }

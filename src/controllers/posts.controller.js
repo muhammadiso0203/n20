@@ -7,7 +7,7 @@ export class PostController {
       const { error, value } = postValidator(req.body);
 
       if (error) {
-        throw new Error(`Error in creating post: ${error.message}`);
+        catchError(res, 400, `Error in creating post`);
       }
 
       const { title, content, user_id } = value;
@@ -18,7 +18,7 @@ export class PostController {
         .status(201)
         .json({ statusCode: 201, message: "success", data: newPost });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -30,7 +30,7 @@ export class PostController {
         .status(200)
         .json({ statusCode: 200, message: "success", data: allPosts });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -39,19 +39,19 @@ export class PostController {
       const id = req.params.id;
 
       if (!id) {
-        throw new Error("ID not found");
+        catchError(res, 400, `ID not found`);
       }
       const post = await Post.findById(id);
 
       if (!post) {
-        throw new Error(`Post not found`);
+        catchError(res, 404, `Post not found`);
       }
 
       return res
         .status(200)
         .json({ statusCode: 200, message: "success", data: post });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -60,13 +60,13 @@ export class PostController {
       const id = req.params.id;
 
       if (!id) {
-        throw new Error("ID not found");
+        catchError(res, 400, `ID not found`);
       }
 
       const post = await Post.findById(id);
 
       if (!post) {
-        throw new Error(`Post not found`);
+        catchError(res, 404, `Post not found`);
       }
 
       const updatedPost = await Post.findByIdAndUpdate(id, req.body, {
@@ -77,7 +77,7 @@ export class PostController {
         .status(200)
         .json({ statusCode: 200, message: "success", data: updatedPost });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -86,13 +86,13 @@ export class PostController {
       const id = req.params.id;
 
       if (!id) {
-        throw new Error("ID not found");
+        catchError(res, 400, `ID not found`);
       }
 
       const post = await Post.findById(id);
 
       if (!post) {
-        throw new Error(`Post not found`);
+        catchError(res, 404, `Post not found`);
       }
 
       await Post.findByIdAndDelete(id);
@@ -100,7 +100,7 @@ export class PostController {
         .status(200)
         .json({ statusCode: 200, message: "success", data: {} });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 }

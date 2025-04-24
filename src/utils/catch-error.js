@@ -1,6 +1,6 @@
-export const catchError = (err, res) => {
-  return res.status(err.statusCode || 500).json({
-    message: err.message || "Internal server error",
-    name: err.name,
+export const catchError = (res, code, error) => {
+  return res.status(code || 500).json({
+    statusCode: code,
+    message: error || "Internal server error",
   });
 };

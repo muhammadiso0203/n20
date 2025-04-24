@@ -12,7 +12,7 @@ export class UserController {
     try {
       const { error, value } = userValidator(req.body);
       if (error) {
-        throw new Error(`Error in signing up user:`, error.message);
+        catchError(res, 400, `Error in signing up user`);
       }
 
       const { username, email, password } = value;
@@ -20,7 +20,7 @@ export class UserController {
       const existing = await User.findOne({ username });
 
       if (existing) {
-        throw new Error("User already exists");
+        catchError(res, 409, `User already exists`);
       }
 
       const decodedPassword = await decode(password);
@@ -42,7 +42,7 @@ export class UserController {
         },
       });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -53,13 +53,13 @@ export class UserController {
       const existing = await User.findOne({ email });
 
       if (!existing) {
-        throw new Error("User not found");
+        catchError(res, 401, `User not found`);
       }
 
       const encodedPassword = await encode(password, existing.decodedPassword);
 
       if (!encodedPassword) {
-        throw new Error("Error in encoding user password");
+        catchError(res, 400, `Error in encoding password`);
       }
 
       const payload = {
@@ -69,13 +69,19 @@ export class UserController {
 
       const token = generateToken(payload);
 
+      const { accessToken, refreshToken } = token;
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
       return res.status(200).json({
         statusCode: 200,
         message: "success",
-        token,
+        accessToken,
       });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 }

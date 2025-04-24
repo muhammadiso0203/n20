@@ -12,20 +12,14 @@ export class AdminController {
     try {
       const { error, value } = adminValidator(req.body);
       if (error) {
-        return res.status(400).json({
-          statusCode: 400,
-          message: `Error in signing up superadmin`,
-        });
+        catchError(res, 400, `Error in signing up superadmin`);
       }
 
       const { username, email, password } = value;
       const existing = await Admin.findOne({ role: "superadmin" });
 
       if (existing) {
-        return res.status(409).json({
-          statusCode: 409,
-          message: `${existing.role} already exists`,
-        });
+        catchError(res, 409, "Superadmin already exists");
       }
 
       const decodedPassword = await decode(password);
@@ -47,7 +41,7 @@ export class AdminController {
         },
       });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -55,20 +49,14 @@ export class AdminController {
     try {
       const { error, value } = adminValidator(req.body);
       if (error) {
-        return res.status(400).json({
-          statusCode: 400,
-          message: `Error in signing up admin`,
-        });
+        catchError(res, 400, `Error in signing up admin`);
       }
 
       const { username, email, password } = value;
       const existing = await Admin.findOne({ username });
 
       if (existing) {
-        return res.status(409).json({
-          statusCode: 409,
-          message: `${existing.role} already exists`,
-        });
+        catchError(res, 409, "Admin already exists");
       }
 
       const decodedPassword = await decode(password);
@@ -90,7 +78,7 @@ export class AdminController {
         },
       });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -101,15 +89,13 @@ export class AdminController {
       const existing = await Admin.findOne({ email });
 
       if (!existing) {
-        return res.status(404).json({ message: `Admin not found` });
+        catchError(res, 404, `Admin not found`);
       }
 
       const encodedPassword = await encode(password, existing.decodedPassword);
 
       if (!encodedPassword) {
-        return res
-          .status(400)
-          .json({ message: `Error in encoding admin password` });
+        catchError(res, 400, `Error in encoding password`);
       }
 
       const payload = {
@@ -119,13 +105,21 @@ export class AdminController {
 
       const token = generateToken(payload);
 
+      const { accessToken, refreshToken } = token;
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
+
       return res.status(200).json({
         statusCode: 200,
         message: "success",
-        token,
+        accessToken,
       });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -137,7 +131,7 @@ export class AdminController {
         .status(200)
         .json({ statusCode: 200, message: "ok", allAdmins: admins });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -149,60 +143,37 @@ export class AdminController {
         .status(200)
         .json({ statusCode: 200, message: "ok", allUsers: users });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
   async updateAdminById(req, res) {
     try {
-      const { id } = req.params;
+      await this.findAdminById(req.params.id);
 
-      if (!id) {
-        return res
-          .status(400)
-          .json({ statusCode: 400, message: `ID not found` });
-      }
-      const body = req.body;
+      const admin = await Admin.findByIdAndUpdate(id, req.body, { new: true });
 
-      const existingAdmin = await Admin.findByIdAndUpdate(id, body);
-
-      if (!existingAdmin) {
-        return res
-          .status(404)
-          .json({ statusCode: 404, message: "Admin not found" });
+      if (!admin) {
+        catchError(res, 404, `Admin not found`);
       }
 
       return res
         .status(200)
         .json({ statusCode: 200, message: "Admin successfully updated" });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
   async getAdminById(req, res) {
     try {
-      const { id } = req.params;
-
-      if (!id) {
-        return res
-          .status(400)
-          .json({ statusCode: 400, message: `ID not found` });
-      }
-
-      const existingAdmin = await Admin.findById(id);
-
-      if (!existingAdmin) {
-        return res
-          .status(404)
-          .json({ statusCode: 404, message: "Admin not found" });
-      }
+      const admin = await this.findAdminById(req.params.id);
 
       return res
         .status(200)
-        .json({ statusCode: 200, message: "ok", admin: existingAdmin });
+        .json({ statusCode: 200, message: "ok", admin: admin });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -211,44 +182,53 @@ export class AdminController {
       const { id } = req.params;
 
       if (!id) {
-        return res
-          .status(400)
-          .json({ statusCode: 400, message: `ID not found` });
+        catchError(res, 400, `ID not found`);
       }
 
       const existingUser = await User.findById(id);
-      
+
       if (!existingUser) {
-        return res
-          .status(404)
-          .json({ statusCode: 404, message: "User not found" });
+        catchError(res, 404, `User not found`);
       }
 
       return res
         .status(200)
         .json({ statusCode: 200, message: "ok", user: existingUser });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
     }
   }
 
   async deleteAdminById(req, res) {
     try {
-      const { id } = req.params;
+      const admin = await this.findAdminById(req.params.id);
 
-      if (!id) {
-        return res
-          .status(400)
-          .json({ statusCode: 400, message: `ID not found` });
+      if (admin.role === "superadmin") {
+        catchError(res, 400, `Danggg Super admin cannot be deleted`);
       }
-
       await Admin.findByIdAndDelete(id);
 
       return res
         .status(200)
         .json({ statusCode: 200, message: "Admin successfully deleted" });
     } catch (error) {
-      catchError(error, res);
+      catchError(res, 500, `Internal server error`);
+    }
+  }
+
+  async findAdminById(id) {
+    try {
+      if (!id) {
+        catchError(res, 400, `ID not found`);
+      }
+      const admin = await Admin.findById(id);
+
+      if (!admin) {
+        catchError(res, 404, `Admin not found by ${id}`);
+      }
+      return admin;
+    } catch (error) {
+      catchError(res, 500, `Internal server error`);
     }
   }
 }
