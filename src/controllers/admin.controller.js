@@ -143,24 +143,6 @@ export class AdminController {
     }
   }
 
-  async updateAdminById(req, res) {
-    try {
-      await this.findAdminById(req.params.id);
-
-      const admin = await Admin.findByIdAndUpdate(id, req.body, { new: true });
-
-      if (!admin) {
-        catchError(res, 404, `Admin not found`);
-      }
-
-      return res
-        .status(200)
-        .json({ statusCode: 200, message: "Admin successfully updated" });
-    } catch (error) {
-      catchError(res, 500, `Internal server error`);
-    }
-  }
-
   async getAdminById(req, res) {
     try {
       const admin = await this.findAdminById(req.params.id);
@@ -194,7 +176,25 @@ export class AdminController {
       catchError(res, 500, `Internal server error`);
     }
   }
+  
+  async updateAdminById(req, res) {
+    try {
+      await this.findAdminById(req.params.id);
 
+      const admin = await Admin.findByIdAndUpdate(id, req.body, { new: true });
+
+      if (!admin) {
+        catchError(res, 404, `Admin not found`);
+      }
+
+      return res
+        .status(200)
+        .json({ statusCode: 200, message: "Admin successfully updated" });
+    } catch (error) {
+      catchError(res, 500, `Internal server error`);
+    }
+  }
+  
   async deleteAdminById(req, res) {
     try {
       const admin = await this.findAdminById(req.params.id);
