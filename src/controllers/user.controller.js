@@ -5,6 +5,7 @@ import {
   encode,
   generateToken,
   userValidator,
+  cookie
 } from "../utils/index.js";
 
 export class UserController {
@@ -70,11 +71,8 @@ export class UserController {
       const token = generateToken(payload);
 
       const { accessToken, refreshToken } = token;
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      });
+      cookie(res, refreshToken);
+
       return res.status(200).json({
         statusCode: 200,
         message: "success",
