@@ -5,7 +5,9 @@ import {
   encode,
   generateToken,
   userValidator,
-  cookie
+  cookie,
+  transporter,
+  mailMesssage,
 } from "../utils/index.js";
 
 export class UserController {
@@ -72,6 +74,11 @@ export class UserController {
 
       const { accessToken, refreshToken } = token;
       cookie(res, refreshToken);
+
+      transporter.sendMail(mailMesssage, (err, info) => {
+        if (err) catchError(res, 400, err);
+        console.log(info);
+      });
 
       return res.status(200).json({
         statusCode: 200,

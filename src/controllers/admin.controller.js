@@ -6,6 +6,8 @@ import {
   adminValidator,
   generateToken,
   cookie,
+  transporter,
+  mailMesssage,
 } from "../utils/index.js";
 
 export class AdminController {
@@ -109,6 +111,11 @@ export class AdminController {
       const { accessToken, refreshToken } = token;
       cookie(res, refreshToken);
 
+      transporter.sendMail(mailMesssage, (err, info) => {
+        if (err) catchError(res, 400, err);
+        console.log(info);
+      });
+
       return res.status(200).json({
         statusCode: 200,
         message: "success",
@@ -176,7 +183,7 @@ export class AdminController {
       catchError(res, 500, `Internal server error`);
     }
   }
-  
+
   async updateAdminById(req, res) {
     try {
       await this.findAdminById(req.params.id);
@@ -194,7 +201,7 @@ export class AdminController {
       catchError(res, 500, `Internal server error`);
     }
   }
-  
+
   async deleteAdminById(req, res) {
     try {
       const admin = await this.findAdminById(req.params.id);
