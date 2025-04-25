@@ -5,10 +5,11 @@ import { CommentController } from "../controllers/index.js";
 const controller = new CommentController();
 const router = Router();
 
-router.get("/", controller.getAllComments);
-router.get("/:id", controller.getCommentById);
-router.post("/", controller.createComment);
-router.patch("/:id", controller.updateCommentById);
-router.delete("/:id", controller.deleteCommentById);
+router
+  .get("/", controller.getAllComments)
+  .get("/:id", controller.getCommentById)
+  .post("/", controller.createComment)
+  .patch("/:id", controller.updateCommentById)
+  .delete("/:id", controller.deleteCommentById);
 
 export { router as commentRouter };

@@ -7,7 +7,10 @@ export const superAdminGuard = (req, res, next) => {
     if (user.role !== "superadmin") {
       return res
         .status(403)
-        .json({ statusCode: 403, message: "Forbidden user" });
+        .json({
+          statusCode: 403,
+          message: `Access denied for role ${user.role}`,
+        });
     }
 
     next();

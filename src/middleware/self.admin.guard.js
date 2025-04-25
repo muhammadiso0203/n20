@@ -8,7 +8,12 @@ export const selfGuard = (req, res, next) => {
       return next();
     }
 
-    return res.status(403).json({ statusCode: 403, message: "Forbidden user" });
+    return res
+      .status(403)
+      .json({
+        statusCode: 403,
+        message: `Access denied for role ${user.role}`,
+      });
   } catch (error) {
     catchError(error, res);
   }
