@@ -14,6 +14,8 @@ router
   .post("/signupSuperAdmin", controller.signUpSuperAdmin)
   .post("/signupAdmin", jwtAuthGuard, superAdminGuard, controller.signUpAdmin)
   .post("/signinAdmin", controller.signInAdmin)
+  .post("/signoutAdmin", jwtAuthGuard, controller.signOutAdmin)
+  .post("/accessToken", controller.accessToken)
   .get("/allAdmins", jwtAuthGuard, superAdminGuard, controller.getAllAdmins)
   .get("/allUsers", jwtAuthGuard, selfGuard, controller.getAllUsers)
   .get("/users/:id", jwtAuthGuard, selfGuard, controller.getUserById)

@@ -8,6 +8,7 @@ import {
   cookie,
   transporter,
   mailMesssage,
+  verifyToken,
 } from "../utils/index.js";
 
 export class AdminController {
@@ -123,6 +124,59 @@ export class AdminController {
       });
     } catch (error) {
       catchError(res, 500, `Internal server error`);
+    }
+  }
+
+  async signOutAdmin(req, res) {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+
+      if (!refreshToken) {
+        return catchError(res, 401, "Refresh Token not found");
+      }
+
+      const { valid } = verifyToken(refreshToken);
+
+      if (!valid) {
+        return catchError(res, 401, "Refresh Token expired");
+      }
+
+      res.clearCookie("refreshToken");
+
+      return res
+        .status(200)
+        .json({ statusCode: 200, message: "success", data: {} });
+    } catch (error) {
+      catchError(res, 500, error);
+    }
+  }
+
+  async accessToken(req, res) {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+
+      if (!refreshToken) {
+        return catchError(res, 401, "Refresh Token not found");
+      }
+
+      const { valid, encoded } = verifyToken(refreshToken);
+
+      if (!valid) {
+        return catchError(res, 401, "Refresh Token expired");
+      }
+
+      const payload = {
+        id: encoded.id,
+        role: encoded.role,
+      };
+
+      const { accessToken } = generateToken(payload);
+
+      return res
+        .status(200)
+        .json({ statusCode: 200, message: "success", data: accessToken });
+    } catch (error) {
+      catchError(res, 500, error);
     }
   }
 
