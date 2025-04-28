@@ -6,9 +6,10 @@ import {
   adminValidator,
   generateToken,
   cookie,
-  transporter,
-  mailMesssage,
   verifyToken,
+  sendMail,
+  otpGenerator,
+  cache,
 } from "../utils/index.js";
 
 export class AdminController {
@@ -16,14 +17,14 @@ export class AdminController {
     try {
       const { error, value } = adminValidator(req.body);
       if (error) {
-        catchError(res, 400, `Error in signing up superadmin`);
+        return catchError(res, 400, `Error in signing up superadmin`);
       }
 
       const { username, email, password } = value;
       const existing = await Admin.findOne({ role: "superadmin" });
 
       if (existing) {
-        catchError(res, 409, "Superadmin already exists");
+        return catchError(res, 409, "Superadmin already exists");
       }
 
       const decodedPassword = await decode(password);
@@ -45,7 +46,7 @@ export class AdminController {
         },
       });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -53,14 +54,14 @@ export class AdminController {
     try {
       const { error, value } = adminValidator(req.body);
       if (error) {
-        catchError(res, 400, `Error in signing up admin`);
+        return catchError(res, 400, `Error in signing up admin`);
       }
 
       const { username, email, password } = value;
       const existing = await Admin.findOne({ username });
 
       if (existing) {
-        catchError(res, 409, "Admin already exists");
+        return catchError(res, 409, "Admin already exists");
       }
 
       const decodedPassword = await decode(password);
@@ -82,7 +83,7 @@ export class AdminController {
         },
       });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -93,13 +94,46 @@ export class AdminController {
       const existing = await Admin.findOne({ email });
 
       if (!existing) {
-        catchError(res, 404, `Admin not found`);
+        return catchError(res, 404, `Admin not found`);
       }
 
       const encodedPassword = await encode(password, existing.decodedPassword);
 
       if (!encodedPassword) {
-        catchError(res, 400, `Error in encoding password`);
+        return catchError(res, 400, `Error in encoding password`);
+      }
+
+      const otp = otpGenerator();
+      sendMail(email, "Otp sent", otp);
+      cache.setCache(existing.username, otp);
+
+      return res.status(200).json({
+        statusCode: 200,
+        message: "OTP sent",
+      });
+    } catch (error) {
+      return catchError(res, 500, `Internal server error`);
+    }
+  }
+
+  async signinConfirmAdmin(req, res) {
+    try {
+      const { username, otp } = req.body;
+
+      const otpCache = cache.getCache(username);
+
+      if (!otpCache) {
+        return catchError(res, 404, `Username not found`);
+      }      
+
+      if (!otp || otp !== otpCache) {
+        return catchError(res, 400, `Otp expired or invalid otp`);
+      }
+
+      const existing = await Admin.findOne({ username });
+
+      if (!existing) {
+        return catchError(res, 404, `Admin not found`);
       }
 
       const payload = {
@@ -112,18 +146,11 @@ export class AdminController {
       const { accessToken, refreshToken } = token;
       cookie(res, refreshToken);
 
-      transporter.sendMail(mailMesssage, (err, info) => {
-        if (err) catchError(res, 400, err);
-        console.log(info);
-      });
-
-      return res.status(200).json({
-        statusCode: 200,
-        message: "success",
-        accessToken,
-      });
+      return res
+        .status(200)
+        .json({ statusCode: 200, message: "success", data: accessToken });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, error);
     }
   }
 
@@ -147,7 +174,7 @@ export class AdminController {
         .status(200)
         .json({ statusCode: 200, message: "success", data: {} });
     } catch (error) {
-      catchError(res, 500, error);
+      return catchError(res, 500, error);
     }
   }
 
@@ -176,7 +203,7 @@ export class AdminController {
         .status(200)
         .json({ statusCode: 200, message: "success", data: accessToken });
     } catch (error) {
-      catchError(res, 500, error);
+      return catchError(res, 500, error);
     }
   }
 
@@ -188,7 +215,7 @@ export class AdminController {
         .status(200)
         .json({ statusCode: 200, message: "ok", allAdmins: admins });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -200,7 +227,7 @@ export class AdminController {
         .status(200)
         .json({ statusCode: 200, message: "ok", allUsers: users });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -212,7 +239,7 @@ export class AdminController {
         .status(200)
         .json({ statusCode: 200, message: "ok", admin: admin });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -221,20 +248,20 @@ export class AdminController {
       const { id } = req.params;
 
       if (!id) {
-        catchError(res, 400, `ID not found`);
+        return catchError(res, 400, `ID not found`);
       }
 
       const existingUser = await User.findById(id);
 
       if (!existingUser) {
-        catchError(res, 404, `User not found`);
+        return catchError(res, 404, `User not found`);
       }
 
       return res
         .status(200)
         .json({ statusCode: 200, message: "ok", user: existingUser });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -245,14 +272,14 @@ export class AdminController {
       const admin = await Admin.findByIdAndUpdate(id, req.body, { new: true });
 
       if (!admin) {
-        catchError(res, 404, `Admin not found`);
+        return catchError(res, 404, `Admin not found`);
       }
 
       return res
         .status(200)
         .json({ statusCode: 200, message: "Admin successfully updated" });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -261,7 +288,7 @@ export class AdminController {
       const admin = await this.findAdminById(req.params.id);
 
       if (admin.role === "superadmin") {
-        catchError(res, 400, `Danggg Super admin cannot be deleted`);
+        return catchError(res, 400, `Danggg Super admin cannot be deleted`);
       }
       await Admin.findByIdAndDelete(id);
 
@@ -269,23 +296,23 @@ export class AdminController {
         .status(200)
         .json({ statusCode: 200, message: "Admin successfully deleted" });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
   async findAdminById(id) {
     try {
       if (!id) {
-        catchError(res, 400, `ID not found`);
+        return catchError(res, 400, `ID not found`);
       }
       const admin = await Admin.findById(id);
 
       if (!admin) {
-        catchError(res, 404, `Admin not found by ${id}`);
+        return catchError(res, 404, `Admin not found by ${id}`);
       }
       return admin;
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 }

@@ -6,8 +6,9 @@ import {
   generateToken,
   userValidator,
   cookie,
-  transporter,
-  mailMesssage,
+  cache,
+  sendMail,
+  otpGenerator,
 } from "../utils/index.js";
 
 export class UserController {
@@ -15,7 +16,7 @@ export class UserController {
     try {
       const { error, value } = userValidator(req.body);
       if (error) {
-        catchError(res, 400, `Error in signing up user`);
+        return catchError(res, 400, `Error in signing up user`);
       }
 
       const { username, email, password } = value;
@@ -23,7 +24,7 @@ export class UserController {
       const existing = await User.findOne({ username });
 
       if (existing) {
-        catchError(res, 409, `User already exists`);
+        return catchError(res, 409, `User already exists`);
       }
 
       const decodedPassword = await decode(password);
@@ -45,7 +46,7 @@ export class UserController {
         },
       });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 
@@ -56,37 +57,25 @@ export class UserController {
       const existing = await User.findOne({ email });
 
       if (!existing) {
-        catchError(res, 401, `User not found`);
+        return catchError(res, 401, `User not found`);
       }
 
       const encodedPassword = await encode(password, existing.decodedPassword);
 
       if (!encodedPassword) {
-        catchError(res, 400, `Error in encoding password`);
+        return catchError(res, 400, `Error in encoding password`);
       }
 
-      const payload = {
-        sub: existing._id,
-        role: "user",
-      };
-
-      const token = generateToken(payload);
-
-      const { accessToken, refreshToken } = token;
-      cookie(res, refreshToken);
-
-      transporter.sendMail(mailMesssage, (err, info) => {
-        if (err) catchError(res, 400, err);
-        console.log(info);
-      });
+      const otp = otpGenerator();
+      sendMail(email, "Otp sent", otp);
+      cache.setCache(existing.username, otp);
 
       return res.status(200).json({
         statusCode: 200,
-        message: "success",
-        accessToken,
+        message: "OTP sent",
       });
     } catch (error) {
-      catchError(res, 500, `Internal server error`);
+      return catchError(res, 500, `Internal server error`);
     }
   }
 }
