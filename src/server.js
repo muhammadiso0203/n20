@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import morgan from "morgan";
 
 import { mongoConnection } from "./db/index.js";
 import { mainRouter } from "./routes/index.js";
@@ -12,6 +13,7 @@ const PORT = +process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
+app.use(morgan("dev"));
 await mongoConnection();
 
 app.use("/blog", mainRouter);
