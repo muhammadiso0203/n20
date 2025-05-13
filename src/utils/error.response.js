@@ -1,0 +1,3 @@
+export const errorRes = (res, statusCode, message) => {
+  return res.status(statusCode).json({ statusCode, message });
+};
