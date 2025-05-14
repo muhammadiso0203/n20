@@ -1,18 +1,21 @@
 import { Pool } from "pg";
 import { config } from "dotenv";
-config()
+config();
+import { join } from "node:path";
+import { readFileSync } from "node:fs";
 
-export const connection = new Pool({
-  host: process.env.PG_HOST,
-  port: process.env.PG_PORT,
-  user: process.env.PG_USER,
-  database: process.env.PG_DB,
-  password: process.env.PG_PASS,
+export const db = new Pool({
+  connectionString: process.env.DB,
 });
 
-export const pgConnection = async () => {
-  await connection
-    .connect()
-    .then(() => console.log(`PG connected`))
-    .catch((err) => console.error(`Error in connecting pg:`, err));
+export const pgConnect = async () => {
+  try {
+    const pathFile = join("src/config/init.sql");
+    const sql = readFileSync(pathFile, "utf8");
+
+    await db.query(sql);
+    console.log(`Tables created successfully`);
+  } catch (err) {
+    console.error(`Error creating tables:`, err.message);
+  }
 };
