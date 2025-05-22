@@ -51,7 +51,7 @@ export class CountriesService {
       }
     }
 
-    countries[index] = {id: +id, ...updateCountryDto}
+    countries[index] = {...countries[index], ...updateCountryDto}
     writeData(countries)
     return {
       statusCode: 200,
