@@ -11,12 +11,7 @@ export class PostsService {
   constructor(@InjectModel(Post.name) private model: Model<Post>) {}
   async create(createPostDto: CreatePostDto) {
     try {
-      const { title, content, userId } = createPostDto;
-      const newPost = await this.model.create({
-        title,
-        content,
-        userId: new Types.ObjectId(userId),
-      });
+      const newPost = await this.model.create(createPostDto);
       return {
         statusCode: 201,
         message: 'success',
