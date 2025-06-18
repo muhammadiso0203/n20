@@ -48,7 +48,21 @@ export class BotService {
       }
 
       const data = rates.data[target.toUpperCase()].value;
-      await ctx.reply(`1 ${base} = ${data.toFixed(2)} ${target}`);
+
+      const date = new Date();
+      const year = date.getFullYear();
+      const month =
+        date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth();
+      const day = date.getDate();
+      const hour =
+        date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+      const minute = date.getMinutes();
+      const second = date.getSeconds();
+      const currentDate = `${year}-${month}-${day}T${hour}:${minute}:${second}`;
+
+      await ctx.reply(
+        `1 ${base} = ${data.toFixed(2)} ${target}\nLast uptaded currency: ${rates.meta.last_updated_at}\nCurrent date: ${currentDate}`,
+      );
     } catch (e) {
       console.log(e);
     }
