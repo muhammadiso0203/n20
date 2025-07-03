@@ -14,9 +14,8 @@ export class PostsService {
   }
 
   async findAll() {
-    return {
-      data: await this.postRepo.find({ relations: ['user'] }),
-    };
+    const posts = await this.postRepo.find();
+    return posts;
   }
 
   async findOne(id: string) {
